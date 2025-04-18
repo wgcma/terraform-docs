@@ -1,0 +1,71 @@
+########## Sleep ##########
+
+resource "null_resource" "previous" {}
+resource "time_sleep" "wait_5_seconds" {
+  depends_on = [null_resource.previous]
+  create_duration = "5s"
+}
+resource "null_resource" "next" {
+  depends_on = [time_sleep.wait_5_seconds]
+}
+
+########## Secure Information ##########
+
+variable "user_information" {
+  type = object({
+    name    = string
+    address = string
+  })
+  sensitive = true # <----- will not be printed out in terraform output
+}
+resource "some_resource" "a" {
+  name    = var.user_information.name
+  address = var.user_information.address
+}
+
+########## Variable Definition Files ##########
+# Mac/Linux
+terraform apply -var-file="testing.tfvars"
+terraform apply -var-file="testing.tfvars.json"
+
+# Env Var
+# > export TF_VAR_image_id=ami-abc123
+# > terraform plan
+
+########## Variable Types ##########
+
+# String
+# Number
+# Bool
+
+##### Collections
+# list
+# set
+# map
+# object
+# tuple
+
+########## Variable Map Type ##########
+variable "aws_regions" {
+  type = map(string)
+  description = "A map of AWS region codes to their names"
+  default = {
+    "us-east-1"    = "US East (N. Virginia)"
+    "us-west-2"    = "US West (Oregon)"
+    "eu-west-1"    = "EU (Ireland)"
+    "ap-southeast-2" = "Asia Pacific (Sydney)"
+  }
+}
+
+output "aws_regions_output" {
+  value = var.aws_regions
+}
+
+output "us_east_1_name" {
+  value = var.aws_regions["us-east-1"]
+}
+
+
+
+
+
